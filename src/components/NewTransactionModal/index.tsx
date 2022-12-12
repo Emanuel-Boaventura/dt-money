@@ -7,7 +7,7 @@ import {
   TransactionType,
   TransactionTypeButton,
 } from './styles';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -15,13 +15,14 @@ const newTransactionFormSchema = z.object({
   description: z.string(),
   price: z.number(),
   category: z.string(),
-  // type: z.enum(['income', 'outcome']),
+  type: z.enum(['income', 'outcome']),
 });
 
 type TNewTransactionFormInputs = z.infer<typeof newTransactionFormSchema>;
 
 const NewTransactionModal = () => {
   const {
+    control,
     register,
     handleSubmit,
     formState: { isSubmitting },
@@ -63,17 +64,29 @@ const NewTransactionModal = () => {
             placeholder='Categoria'
             required
           />
-          <TransactionType>
-            <TransactionTypeButton variant='income' value='income'>
-              <ArrowCircleUp size={24} />
-              Entrada
-            </TransactionTypeButton>
 
-            <TransactionTypeButton variant='outcome' value='outcome'>
-              <ArrowCircleDown size={24} />
-              Saida
-            </TransactionTypeButton>
-          </TransactionType>
+          <Controller
+            control={control}
+            name='type'
+            render={({ field }) => {
+              return (
+                <TransactionType
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <TransactionTypeButton variant='income' value='income'>
+                    <ArrowCircleUp size={24} />
+                    Entrada
+                  </TransactionTypeButton>
+
+                  <TransactionTypeButton variant='outcome' value='outcome'>
+                    <ArrowCircleDown size={24} />
+                    Saida
+                  </TransactionTypeButton>
+                </TransactionType>
+              );
+            }}
+          />
 
           <button disabled={isSubmitting} type='submit'>
             Cadastrar
